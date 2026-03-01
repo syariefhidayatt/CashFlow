@@ -1,65 +1,84 @@
-import Image from "next/image";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import DeleteTransactionButton from "@/app/components/DeleteTransactionButton";
+import Link from "next/link";
 
-export default function Home() {
+export default async function Dashboard() {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect("/login");
+  }
+
+  const currentUser = await prisma.user.findUnique({
+    where: {
+      email: session.user?.email,
+    },
+  });
+
+  if (!currentUser) {
+    return <h2>Error: Akun tidak valid.</h2>;
+  }
+
+  const transaction = await prisma.transaction.findMany({
+    where: {
+      userId: currentUser.id,
+    },
+    include: {
+      category: true,
+    },
+  });
+
+  const totalIncome = transaction
+    .filter((trx) => trx.category.categoryType === "INCOME")
+    .reduce((total, trx) => total + trx.amount, 0);
+
+  const totalExpense = transaction
+    .filter((trx) => trx.category.categoryType === "EXPENSE")
+    .reduce((total, trx) => total + trx.amount, 0);
+
+  const balance = totalIncome - totalExpense;
+
+  const formatRupiah = (angka: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(angka);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main>
+      <h1>Selamat datang, {session.user?.name}</h1>
+      <div className="flex gap-4">
+        <h2>Total Saldo: {formatRupiah(balance)}</h2>
+        <div>
+          <h3>Riwayat Transaksi Terbaru</h3>
+          <Link
+            href="/transaction"
+            className="bg-blue-500 text-white px-3 py-1 rounded inline-block mb-4"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            + Tambah Transaksi
+          </Link>
+          <ul>
+            {transaction.map((trx) => (
+              <li key={trx.id}>
+                {trx.description} | {trx.category.categoryName} |{" "}
+                {formatRupiah(trx.amount)}
+                <Link
+                  href={`/transaction/${trx.id}/edit`}
+                  className="bg-yellow-500 text-white px-2 py-1 mx-2 rounded text-sm"
+                >
+                  Edit
+                </Link>
+                <DeleteTransactionButton transactionId={trx.id} />
+              </li>
+            ))}
+          </ul>
         </div>
-      </main>
-    </div>
+        <p>Total Pemasukan: {formatRupiah(totalIncome)}</p>
+        <p>Total Pengeluaran: {formatRupiah(totalExpense)}</p>
+      </div>
+    </main>
   );
 }
