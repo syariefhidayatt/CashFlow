@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { deleteTransactionAction } from "../actions/transaction";
+import Button from "./Button";
 
 interface Props {
   transactionId: number;
@@ -15,9 +16,7 @@ export default function DeleteTransactionButton({ transactionId }: Props) {
   );
   return (
     <form action={formAction}>
-      <button type="submit" disabled={isPending} className="">
-        {isPending ? "Menghapus..." : "Hapus"}
-      </button>
+      <Button variant="danger">{isPending ? "Menghapus..." : "Hapus"}</Button>
       {state?.error && (
         <span className="text-red-500 text-xs">{state.error}</span>
       )}

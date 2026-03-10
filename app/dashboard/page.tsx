@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import DeleteTransactionButton from "../components/DeleteTransactionButton";
 import Link from "next/link";
 import DashboardChart from "../components/DashboardChart";
+import { logoutUserAction } from "../actions/auth";
+import Button from "../components/Button";
 
 export default async function Dashboard() {
   const session = await auth();
@@ -50,9 +52,16 @@ export default async function Dashboard() {
 
   return (
     <main className="container max-w-5xl mx-auto p-6 ">
-      <header className="text-2xl font-bold mb-4">
-        <h1>Dashboard Keuangan</h1>
-      </header>
+      <div className="flex justify-between pb-4">
+        <h1 className="font-bold text-xl">
+          Dashboard Keuangan, {currentUser.name}
+        </h1>
+        <form action={logoutUserAction}>
+          <Button type="submit" variant="danger">
+            Logout
+          </Button>
+        </form>
+      </div>
       <section className="bg-mauve-200 rounded-xl shadow p-6 mb-6">
         <h3 className="text-center text-gray-800 font-semibold text-xl">
           Analisis Saldo
@@ -60,10 +69,10 @@ export default async function Dashboard() {
         <DashboardChart income={totalIncome} expense={totalExpense} />
       </section>
       <div className="flex justify-between items-end mb-2">
-        <h3 className="text-xl font-bold">Riwayat Transaksi Terbaru</h3>
+        <h3 className="font-bold">Riwayat Transaksi Terbaru</h3>
         <Link
           href="/transaction"
-          className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded "
+          className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md font-semibold "
         >
           + Tambah Transaksi
         </Link>
@@ -71,7 +80,7 @@ export default async function Dashboard() {
 
       <section className="bg-mauve-200 rounded-xl shadow">
         <div
-          className={`font-bold p-2 border-b-2 ${balance >= 0 ? "text-green-600" : "text-red-600"}`}
+          className={`font-bold p-2 border-b-2 rounded-xl ${balance >= 0 ? "text-green-600" : "text-red-600"}`}
         >
           <h2>Total Saldo: {formatRupiah(balance)}</h2>
         </div>
@@ -80,7 +89,7 @@ export default async function Dashboard() {
           {transaction.map((trx) => (
             <li
               key={trx.id}
-              className="p-6 flex justify-between items-center hover:bg-mauve-300"
+              className="p-6 flex justify-between items-center hover:bg-mauve-300 rounded-xl "
             >
               <div>
                 <p className="font-semibold text-gray-800">{trx.description}</p>
@@ -101,13 +110,11 @@ export default async function Dashboard() {
 
                 <Link
                   href={`/transaction/${trx.id}/edit`}
-                  className="bg-yellow-500 hover:bg-yellow-600 rounded text-white px-2 py-1"
+                  className="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-md font-semibold "
                 >
                   Edit
                 </Link>
-                <div className="bg-red-500 hover:bg-red-600 rounded text-white px-2 py-1">
-                  <DeleteTransactionButton transactionId={trx.id} />
-                </div>
+                <DeleteTransactionButton transactionId={trx.id} />
               </div>
             </li>
           ))}

@@ -1,6 +1,7 @@
 "use client";
 import createCategoryAction from "../actions/category";
 import { useActionState } from "react";
+import Button from "../components/Button";
 
 export default function CategoryForm() {
   const [state, formAction, isPending] = useActionState(
@@ -23,9 +24,9 @@ export default function CategoryForm() {
       {state?.success && (
         <p className="text-green-500 text-sm mt-2">{state.success}</p>
       )}
-      <button type="submit" disabled={isPending}>
+      <Button variant="primary">
         {isPending ? "Menyimpan..." : "Tambah Kategori"}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -1,10 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import Button from "./Button";
+import Link from "next/link";
+import { useActionState, useEffect } from "react";
+import { Category, Transaction } from "../generated/prisma";
+import { useRouter } from "next/navigation";
 import createTransactionAction, {
   updateTransactionAction,
 } from "../actions/transaction";
-import { Category, Transaction } from "../generated/prisma";
 
 interface Props {
   categories: Category[];
@@ -15,17 +18,28 @@ export default function TransactionFormClient({
   categories,
   initialData,
 }: Props) {
+  const router = useRouter();
+
   const actionToUse = initialData
     ? updateTransactionAction.bind(null, initialData.id)
     : createTransactionAction;
 
-  const [state, formAction, isPending] = useActionState(
-    createTransactionAction,
-    null,
-  );
+  const [state, formAction, isPending] = useActionState(actionToUse, null);
 
+  useEffect(() => {
+    if (state?.success) {
+      const timer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 0);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state?.success, router]);
   return (
-    <form action={formAction}>
+    <form
+      action={formAction}
+      key={initialData ? initialData.amount && initialData.description : "baru"}
+    >
       <label>Amount</label>
       <input type="number" name="amount" defaultValue={initialData?.amount} />
       <label>Desciption</label>
@@ -48,13 +62,14 @@ export default function TransactionFormClient({
       {state?.success && (
         <p className="text-green-500 text-sm mt-2">{state.success}</p>
       )}
-      <button type="submit" disabled={isPending}>
+      <Button variant="primary">
         {isPending
           ? "Menyimpan..."
           : initialData
             ? "Perbarui Transaksi"
             : "Tambah Transaksi"}
-      </button>
+      </Button>
+      <Link href="/dashboard">Kembali ke dashborad</Link>
     </form>
   );
 }

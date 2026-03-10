@@ -28,7 +28,7 @@ export default function DashboardChart({ income, expense }: Props) {
   }
 
   return (
-    <div className="h-64 w-full">
+    <div className="h-64 w-full ">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -41,9 +41,7 @@ export default function DashboardChart({ income, expense }: Props) {
             dataKey="value"
           />
           <Tooltip
-            formatter={(value: number | string | undefined) =>
-              `Rp ${Number(value).toLocaleString("id-ID")}`
-            }
+            formatter={(value) => `Rp ${Number(value).toLocaleString("id-ID")}`}
           />
           <Legend />
           <Label position="center" fill="#666">

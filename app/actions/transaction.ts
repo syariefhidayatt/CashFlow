@@ -2,7 +2,6 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
-import { redirect } from "next/navigation";
 
 export type ActionState =
   | {
@@ -115,10 +114,10 @@ export async function updateTransactionAction(
         description: rawFormTransaction.description,
       },
     });
+    revalidatePath("/dashboard");
+    return { success: "Transaction Berhasil diperbarui" };
   } catch (err) {
     console.error(err);
     return { error: "Terjadi kesalahan pada sistem" };
   }
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
 }

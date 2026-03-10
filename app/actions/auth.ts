@@ -1,7 +1,7 @@
 "use server";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function registerUserAction(formData: FormData) {
@@ -42,6 +42,10 @@ export async function loginUserAction(formData: FormData) {
   });
 }
 
-export async function loginUserActionProvider() {
-  await signIn("github", { redirectTo: "/dashboard" });
+export async function loginUserActionProvider(provider: "google" | "github") {
+  await signIn(provider, { redirectTo: "/dashboard" });
+}
+
+export async function logoutUserAction() {
+  await signOut({ redirectTo: "/login" });
 }
