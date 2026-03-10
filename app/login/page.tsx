@@ -1,32 +1,80 @@
+"use client";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { SiGithub } from "react-icons/si";
-import { loginUserActionProvider } from "../actions/auth";
-export default function LoginPage() {
+import { useActionState, useEffect, useState } from "react";
+import registerUserAction, {
+  loginCredentialsAction,
+  loginUserActionProvider,
+  ActionState,
+} from "../actions/auth";
+
+export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true);
+
+  const [loginState, loginAction, isLoginPending] = useActionState<
+    ActionState,
+    FormData
+  >(loginCredentialsAction, {});
+
+  const [registerState, registerAction, isRegisterPending] = useActionState<
+    ActionState,
+    FormData
+  >(registerUserAction, {});
+
+  const currentState = isLogin ? loginState : registerState;
+  const currentAction = isLogin ? loginAction : registerAction;
+  const currentPending = isLogin ? isLoginPending : isRegisterPending;
+
+  const toggleAuthMode = () => {
+    setIsLogin((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (registerState?.success) {
+      const timer = setTimeout(() => {
+        setIsLogin(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [registerState?.success]);
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <main className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md bg-slate-800 rounded-xl shadow-2xl p-8">
         <h2 className="text-3xl font-bold text-white text-center mb-8">
-          Login
+          {isLogin ? "Login" : "Create an Account"}
         </h2>
 
-        <form>
-          <Input label="Username" id="username" type="text" required />
-          <Input label="Password" id="password" type="password" required />
-
+        <form action={currentAction}>
+          {currentState?.error && (
+            <p className="text-red-500 mb-2">{currentState?.error}</p>
+          )}{" "}
+          {currentState?.success && (
+            <p className="text-green-500 mb-2">{currentState.success}</p>
+          )}{" "}
+          {!isLogin && (
+            <Input label="Full Name" name="name" id="name" type="text" />
+          )}{" "}
+          <Input label="Email" name="email" id="email" type="email" />
+          <Input
+            label="Password"
+            name="password"
+            id="password"
+            type="password"
+          />
           <div className="flex justify-end mb-6">
             <Link
               href="#"
               className="text-sm text-slate-300 hover:text-white transition-colors"
             >
-              Forgot Password ?
+              {isLogin ? "Forgot Password?" : ""}
             </Link>
           </div>
-
-          <Button type="submit" className="w-full py-3">
-            Sign in
+          <Button type="submit" disabled={currentPending} className="w-full">
+            {currentPending ? "Memproses..." : isLogin ? "Sign in" : "Sign up"}
           </Button>
         </form>
 
@@ -52,15 +100,15 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-slate-400 mt-8 text-sm">
-          Dont have an account?{" "}
-          <Link
-            href="/register"
-            className="text-white font-bold hover:underline"
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <span
+            onClick={toggleAuthMode}
+            className="text-white font-bold hover:underline cursor-pointer"
           >
-            Sign up
-          </Link>
+            {isLogin ? "Sign up" : "Sign in"}
+          </span>
         </p>
       </div>
-    </div>
+    </main>
   );
 }
