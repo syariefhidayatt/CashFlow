@@ -26,9 +26,15 @@ export default async function TransactionPage() {
   });
 
   return (
-    <div>
-      <h2>Tambah Transaksi Baru</h2>
-      <TransactionFormClient categories={categories} />
-    </div>
+    <main className="min-h-screen flex items-center justify-center">
+      <div className="bg-slate-800 w-full max-w-md rounded-xl shadow-2xl p-8">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          Tambah Transaksi Baru
+        </h2>
+        <TransactionFormClient categories={categories} />
+      </div>
+    </main>
   );
 }
+
+

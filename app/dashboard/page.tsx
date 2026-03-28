@@ -72,7 +72,7 @@ export default async function Dashboard() {
         <h3 className="font-bold">Riwayat Transaksi Terbaru</h3>
         <Link
           href="/transaction"
-          className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md font-semibold "
+          className="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md font-semibold"
         >
           + Tambah Transaksi
         </Link>

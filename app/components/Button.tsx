@@ -10,7 +10,7 @@ export default function Button({
   children,
   ...props
 }: ButtonProps) {
-  const baseClases = "px-3 py-1 rounded-md font-semibold cursor-pointer";
+  const baseClases = "px-3 py-2 rounded-md font-semibold cursor-pointer";
 
   const variantStyles = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",

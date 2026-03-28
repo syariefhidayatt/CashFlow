@@ -28,9 +28,14 @@ export default async function EditTransactionPage({
   });
 
   return (
-    <main>
-      <h2>Edit Transaksi</h2>
-      <TransactionFormClient categories={categories} initialData={trasaction} />
+    <main className="min-h-screen flex items-center justify-center">
+      <div className="bg-slate-800 w-full max-w-md rounded-xl shadow-2xl p-8">
+        <h2 className="text-3xl text-center font-bold mb-8">Edit Transaksi</h2>
+        <TransactionFormClient
+          categories={categories}
+          initialData={trasaction}
+        />
+      </div>
     </main>
   );
 }
