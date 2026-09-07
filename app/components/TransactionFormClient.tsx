@@ -21,6 +21,12 @@ export default function TransactionFormClient({
   initialData,
 }: Props) {
   const [IsCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [displayAmount, setDisplayAmount] = useState(
+    initialData?.amount.toString() || "",
+  );
+  const [rawAmount, setRawAmount] = useState(
+    initialData?.amount.toString() || "",
+  );
 
   const router = useRouter();
 
@@ -40,6 +46,33 @@ export default function TransactionFormClient({
     }
   }, [state?.success, router]);
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const cleanNumber = inputValue.replace(/\D/g, "");
+
+    setRawAmount(cleanNumber);
+
+    if (cleanNumber) {
+      const formatted = new Intl.NumberFormat("en-IN").format(
+        Number(cleanNumber),
+      );
+      setDisplayAmount(formatted);
+    } else {
+      setDisplayAmount("");
+    }
+  };
+
+  let defaultDateStr = "";
+
+  if (initialData?.date) {
+    const d = new Date(initialData.date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+
+    defaultDateStr = `${year}-${month}-${day}`;
+  }
+
   return (
     <>
       <form
@@ -50,17 +83,25 @@ export default function TransactionFormClient({
       >
         <Input
           label="Amount"
-          name="amount"
-          id="amount"
-          type="number"
-          defaultValue={initialData?.amount}
+          id="amount-display"
+          type="text"
+          value={displayAmount}
+          onChange={handleAmountChange}
         />
+        <input type="hidden" name="amount" value={rawAmount} />
         <Input
           label="Description"
           name="description"
           id="description"
           type="text"
           defaultValue={initialData?.description}
+        />
+        <Input
+          label="Date"
+          name="date"
+          id="date"
+          type="date"
+          defaultValue={defaultDateStr}
         />
 
         <div className="grid grid-cols-3 gap-1.5 mb-4">

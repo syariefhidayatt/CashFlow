@@ -6,6 +6,7 @@ import Link from "next/link";
 import DashboardChart from "../components/DashboardChart";
 import { logoutUserAction } from "../actions/auth";
 import Button from "../components/Button";
+import { FormatTanggalLokal } from "@/lib/utils";
 
 export default async function Dashboard() {
   const session = await auth();
@@ -97,6 +98,9 @@ export default async function Dashboard() {
                   className={`font-bold text-sm bg-indigo-200 px-2 py-1 rounded ${trx.category.categoryType === "INCOME" ? "text-green-600" : "text-red-600"}`}
                 >
                   {trx.category.categoryName}
+                </span>
+                <span className="text-sm text-gray-800 ">
+                  {FormatTanggalLokal(trx.date)}
                 </span>
               </div>
 

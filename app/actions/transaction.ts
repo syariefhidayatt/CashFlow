@@ -23,6 +23,7 @@ export default async function createTransactionAction(
       categoryId: parseInt(formData.get("categoryId") as string),
       amount: parseInt(formData.get("amount") as string),
       description: formData.get("description") as string,
+      date: new Date(formData.get("date") as string),
     };
     if (!rawFormTransaction.amount || !rawFormTransaction.description)
       return {
@@ -35,6 +36,7 @@ export default async function createTransactionAction(
         categoryId: rawFormTransaction.categoryId,
         amount: rawFormTransaction.amount,
         description: rawFormTransaction.description,
+        date: rawFormTransaction.date,
       },
     });
     revalidatePath("/dashboard");
@@ -99,6 +101,7 @@ export async function updateTransactionAction(
       categoryId: parseInt(formData.get("categoryId") as string),
       amount: parseInt(formData.get("amount") as string),
       description: formData.get("description") as string,
+      date: new Date(formData.get("date") as string),
     };
     if (!rawFormTransaction.amount || !rawFormTransaction.description) {
       return { error: "Semua kolom wajib diisi" };
@@ -112,6 +115,7 @@ export async function updateTransactionAction(
         categoryId: rawFormTransaction.categoryId,
         amount: rawFormTransaction.amount,
         description: rawFormTransaction.description,
+        date: rawFormTransaction.date,
       },
     });
     revalidatePath("/dashboard");
