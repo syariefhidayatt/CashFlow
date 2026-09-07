@@ -2,7 +2,7 @@
 import bcrypt from "bcryptjs";
 import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { AuthError } from "next-auth";
+import AuthError from "next-auth"
 
 export type ActionState =
   | {
@@ -52,7 +52,7 @@ export async function loginCredentialsAction(
     await signIn("credentials", formData);
   } catch (error) {
     if (error instanceof AuthError) {
-      switch (error.type) {
+      switch (error) {
         case "CredentialsSignin":
           return { error: "Email atau Password salah" };
         default:
